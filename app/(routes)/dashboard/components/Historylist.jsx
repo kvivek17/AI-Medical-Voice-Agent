@@ -32,7 +32,7 @@ const Historylist = () => {
       
     }
   return (
-    <div>
+    <div className=' mt-4'>
         {history.length ==0?<div className='flex flex-col justify-center items-center gap-5 border border-shadow  rounded-2xl mt-5 p-5'>
             <Image src={"/assistant.jpg"} width={200} height={200}/>
             <h1 className='text-2xl font-bold'>No History Found</h1>

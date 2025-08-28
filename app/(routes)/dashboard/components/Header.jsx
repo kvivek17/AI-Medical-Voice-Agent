@@ -7,9 +7,8 @@ const Header = () => {
 
     const menuoptions = [
         {id:1, name:"Home", link:"/"},
-        {id:2, name:"History", link:"/history"},
-        {id:3, name:"Pricing", link:"/pricing"},
-        {id:4, name:"Profile", link:"/profile"},
+        {id:2, name:"History", link:"page/history"},
+        {id:3, name:"Pricing", link:"dashboard/Biling"},
     ]
   return (
     <div className='flex justify-between items-center p-2 shadow px-10 md:px-20 lg:px-30 '>
