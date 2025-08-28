@@ -59,7 +59,7 @@ export default function Home() {
           }}
           className="relative z-10 mx-auto max-w-xl py-4 text-center text-lg font-normal text-neutral-600 dark:text-neutral-400">
           Deliver exceptional customer support with our AI-powered agent care.
-          meet your customers' needs with 24/7 assistance, personalized.
+          meet your customers  needs with 24/7 assistance, personalized.
         </motion.p>
         <motion.div
           initial={{
