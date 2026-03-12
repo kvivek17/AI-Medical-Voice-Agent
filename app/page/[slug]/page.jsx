@@ -1,8 +1,7 @@
 import Historylist from "@/app/(routes)/dashboard/components/Historylist";
-import { PricingTable } from "@clerk/nextjs";
 
-export default function Page({ params }) {
-  const { slug } = params;
+export default async function  Page({ params }) {
+  const { slug } =  await params;
 
   if (slug === "history") {
     return <Historylist/>;

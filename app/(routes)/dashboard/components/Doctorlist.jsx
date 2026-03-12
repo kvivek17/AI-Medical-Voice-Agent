@@ -1,11 +1,9 @@
 import React from 'react'
 import { AIDoctorAgents } from '@/shared/list'
-import { auth } from '@clerk/nextjs/server'
 import Doctorcard from './Doctorcard'
 
 const  Doctorlist =async () => {
-   const { has } = await auth();
-      const haspaidplan = has({ plan: 'paid' })
+  
   
 
  
@@ -16,7 +14,7 @@ const  Doctorlist =async () => {
        <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 '>
         {AIDoctorAgents.map((doctor,index)=>{
             return <div key={index}>
-                <Doctorcard doctor={doctor} plan={ haspaidplan } />
+                <Doctorcard doctor={doctor} />
 
                 </div>
         })}

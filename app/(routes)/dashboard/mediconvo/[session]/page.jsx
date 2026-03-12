@@ -6,7 +6,6 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Vapi from "@vapi-ai/web";
-import react from "react";
 
 const Mediconvo = () => {
   const { session } = useParams();
@@ -16,6 +15,7 @@ const Mediconvo = () => {
   const [livetranscript, setlivetranscript] = useState("");
   const [messages, setmessages] = useState([]);
   const [VapiInstance, setVapiInstance] = useState()
+  const [loading, setloading] = useState(false)
 
 
 
@@ -32,107 +32,69 @@ const Mediconvo = () => {
   };
 
   // Start voice conversation
-  const startCall = () => {
-    const vapi = new Vapi(process.env.NEXT_PUBLIC_YOUR_PUBLIC_API_KEY);
-    setVapiInstance(vapi)
+ const startCall = () => {
+  setloading(true);
+   if (VapiInstance) return;
+  const vapi = new Vapi(process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY);
+  setVapiInstance(vapi);
 
+    vapi.start("6e022165-6395-44c8-87ee-6a274193ac41");
 
-    
-      const vapiconfig = {
-  
-      name: "AI Medical Doctor Voice Agent",
-      firstMessage: "Hi there, I am your AI medical assistant",
-      transcriber: {
-        provider: "assembly-ai",
-        language: "en",
-      },
-      voice: {
-        provider: "playht",
-        voiceId: sessiondetails?.selectdoctor?.voiceId || "will",
-      },
-      model: {
-        provider: "openai",
-        model: "gpt-4",
-        messages: [
-          {
-            role: "system",
-            content: sessiondetails?.selectdoctor?.agentPrompt,
-          },
-        ],
-      },
-    
-  }
+  vapi.on("call-start", () => {
+    setCallStart(true);
+    console.log("Call started");
+  });
 
+  vapi.on("error", (e) => {
+    console.log("VAPI ERROR:", e);
+  });
 
-    vapi.start(vapiconfig);
-    vapi.on('call-start', () => {
-      setCallStart(true)
-      console.log('Call started')
-    });
-    vapi.on('call-end', () => {
-      setCallStart(false)
-      console.log('Call ended')
+  vapi.on("call-end", () => {
+    setCallStart(false);
+    console.log("Call ended");
+  });
 
-    });
-        vapi.on('speech-start', () => {
-      console.log("asiisatnce start speaking");
-     setcurrentrole("Assistance")
+  vapi.on("speech-start", () => {
+    console.log("assistant start speaking");
+    setcurrentrole("Assistant");
+  });
 
-    })
-    vapi.on('speech-end', () => {
-      console.log("asiisatnce stop speaking");
-      setcurrentrole("user")
+  vapi.on("speech-end", () => {
+    console.log("assistant stop speaking");
+    setcurrentrole("user");
+  });
 
-    })
+  vapi.on("message", (message) => {
+    if (message.type === "transcript") {
+      const { role, transcriptType, transcript } = message;
 
+      if (transcriptType === "partial") {
+        setlivetranscript(transcript);
+        setcurrentrole(role);
+      } else if (transcriptType === "final") {
+        setmessages((prev) => [
+          ...prev,
+          { role: role, text: transcript }
+        ]);
 
-    vapi.on('message', (message) => {
-      if (message.type === 'transcript') {
-        const {role,transcriptType,transcript}=message;
-        console.log(`${message.role}: ${message.transcript}`);
-        if(transcriptType=='partial'){
-          setlivetranscript(transcript)
-          setcurrentrole(message.role)
-          console.log(role,transcript);
-          
-
-        }
-        else if(transcriptType=='final'){
-          setmessages((prev)=>[
-            ...prev,{role:message.role,text:transcript}
-          ])
-          console.log(messages);
-          
-          setlivetranscript("")
-          setcurrentrole(null)
-
-        }
-
-
+        setlivetranscript("");
+        setcurrentrole(null);
       }
-    });
+    }
+  });
+};
 
+  const endCall = async () => {
+    setloading(false);
+  if (!VapiInstance) return;
 
-  }
+  VapiInstance.stop();
 
+  setCallStart(false);
+  setVapiInstance(null);
 
-  const endCall = async() => {
-    if (!VapiInstance) return;
-
-    VapiInstance.stop();
-    VapiInstance.off("call-start")
-    VapiInstance.off("call-end")
-    VapiInstance.off("message")
-    VapiInstance.off("speech-start");
-    VapiInstance.off("speech-end");
-
-    setCallStart(false)
-    setVapiInstance(null)
-
-    const result = await generatereport()
-
-
-  };
+  await generatereport();
+};
 
 const generatereport= async()=>{
   const result = await axios.post('/api/medical-report',{
@@ -192,7 +154,7 @@ const generatereport= async()=>{
 
           {!callStart ? (
             <Button className="mt-5" onClick={startCall}>
-              <PhoneCall /> Start Call
+              <PhoneCall />{loading ? "Loading..." : "Start Call"}
             </Button>
           ) : (
             <Button variant="destructive" onClick={endCall} className="mt-5">

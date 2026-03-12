@@ -1,7 +1,8 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { UserButton } from '@clerk/nextjs'
+import Loginbutt from './Loginbutt'
+
 
 const Header = () => {
 
@@ -20,7 +21,7 @@ const Header = () => {
         })
     }
        </div>
-       <UserButton/>
+       <Loginbutt/>
        </div>
   )
 }
